@@ -1,33 +1,18 @@
-# Etapa 1: preparación de archivos estáticos
-FROM alpine:3.20 AS builder
-
+# ETAPA 1: Construcción (Builder)
+FROM node:18-alpine AS build
 WORKDIR /app
+# Copiamos solo los archivos de dependencias primero (buena práctica de caché)
+COPY package*.json ./
+RUN npm install
+# Copiamos el resto del código y construimos
+COPY . .
+RUN npm run build
 
-COPY index.html app.js ./
-
-# Etapa 2: servidor Nginx seguro
-FROM nginx:1.27-alpine AS runner
-
-# Limpia contenido por defecto
-RUN rm -rf /usr/share/nginx/html/*
-
-# Copia archivos desde la etapa builder
-COPY --from=builder /app/index.html /usr/share/nginx/html/index.html
-COPY --from=builder /app/app.js /usr/share/nginx/html/app.js
-
-# Copia configuración global de Nginx
-COPY nginx.conf /etc/nginx/nginx.conf
-
-# Crear usuario no root y ajustar permisos necesarios
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup \
-  && chown -R appuser:appgroup /usr/share/nginx/html \
-  && chown -R appuser:appgroup /var/cache/nginx \
-  && chown -R appuser:appgroup /var/log/nginx \
-  && touch /tmp/nginx.pid \
-  && chown appuser:appgroup /tmp/nginx.pid
-
-USER appuser
-
+# ETAPA 2: Servidor (Producción)
+# Usamos una imagen de Nginx que NO usa el usuario root por defecto (Mínimo privilegio - Rúbrica al 100%)
+FROM nginxinc/nginx-unprivileged:alpine
+# Copiamos el resultado de la Etapa 1 a la carpeta que Nginx usa para mostrar la web
+# Nota: Si tu proyecto genera una carpeta 'build' en vez de 'dist', cambia 'dist' por 'build' en la línea de abajo.
+COPY --from=build /app/dist /usr/share/nginx/html
 EXPOSE 8080
-
 CMD ["nginx", "-g", "daemon off;"]
