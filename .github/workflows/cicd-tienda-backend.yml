@@ -39,7 +39,7 @@ jobs:
           ECR_REPO: ${{ secrets.ECR_REPO_URL_BACKEND }}
           ECR_REG: ${{ secrets.ECR_REGISTRY }}
           REGION: ${{ secrets.AWS_REGION }}
-          INSTANCE: ${{ secrets.EC2_BACKEND_INSTANCE_ID }}
+          INSTANCE: ${{ secrets.EC2_DB_INSTANCE_ID }}
           DB_HOST: 172.31.26.221
         run: |
           aws ssm send-command \
