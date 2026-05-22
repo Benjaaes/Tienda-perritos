@@ -1,9 +1,11 @@
 # ETAPA 1: Construcción (Builder)
-FROM node:18-alpine AS build
+FROM node:18 AS build
 WORKDIR /app
+
 # Buscamos en la carpeta actual donde nos paró el robot
 COPY package*.json ./
-RUN npm install
+RUN npm install --legacy-peer-deps
+
 COPY . .
 RUN npm run build
 
