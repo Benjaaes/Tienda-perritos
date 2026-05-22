@@ -2,10 +2,9 @@ name: CI/CD Tienda Perritos - Frontend
 
 on:
   push:
-    branches: ["deploy"]
-    paths:
-      - "frontend/**"
-      - ".github/workflows/cicd-tienda-frontend.yml"
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
   build-push-deploy-frontend:
