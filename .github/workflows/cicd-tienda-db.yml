@@ -7,8 +7,6 @@ on:
   workflow_dispatch:
 
 jobs:
-
-jobs:
   build-push-deploy-db:
     runs-on: ubuntu-latest
 

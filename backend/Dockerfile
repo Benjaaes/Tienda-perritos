@@ -1,12 +1,10 @@
 # ETAPA 1: Construcción (Builder)
 FROM node:18-alpine AS build
 WORKDIR /app
-# Buscamos explícitamente el archivo dentro de la subcarpeta del backend
-COPY backend/package*.json ./
+# Buscamos en la carpeta actual donde nos paró el robot
+COPY package*.json ./
 RUN npm install
-COPY backend/ ./
-# Si tu backend necesita compilarse (ej. TypeScript), descomenta la línea de abajo:
-# RUN npm run build
+COPY . .
 
 # ETAPA 2: Ejecución Ligera
 FROM node:18-alpine

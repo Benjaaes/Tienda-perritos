@@ -1,10 +1,10 @@
 # ETAPA 1: Construcción (Builder)
 FROM node:18-alpine AS build
 WORKDIR /app
-# Corregimos la ruta para que busque dentro de la carpeta frontend
-COPY frontend/package*.json ./
+# Buscamos en la carpeta actual donde nos paró el robot
+COPY package*.json ./
 RUN npm install
-COPY frontend/ ./
+COPY . .
 RUN npm run build
 
 # ETAPA 2: Servidor de Producción (Seguro y No-Root)
