@@ -1,24 +1,24 @@
-# ETAPA 1: Construcción (Maven)
-FROM maven:3.8.5-openjdk-17 AS build
+# ETAPA 1: Construcción (Builder)
+FROM node:18-alpine AS build
 WORKDIR /app
-COPY pom.xml .
-# Descarga las dependencias de internet
-RUN mvn dependency:go-offline
-COPY src ./src
-# Compila el código ignorando los tests para que sea más rápido
-RUN mvn clean package -DskipTests
+# Buscamos explícitamente el archivo dentro de la subcarpeta del backend
+COPY backend/package*.json ./
+RUN npm install
+COPY backend/ ./
+# Si tu backend necesita compilarse (ej. TypeScript), descomenta la línea de abajo:
+# RUN npm run build
 
-# ETAPA 2: Ejecución (Ligera y Segura)
-FROM openjdk:17-jdk-slim
+# ETAPA 2: Ejecución Ligera
+FROM node:18-alpine
 WORKDIR /app
 
-# CREAR USUARIO NO ROOT (Principio de mínimo privilegio - Exigencia del profesor)
-RUN useradd -m miusuarioapp
+# CREAR USUARIO NO ROOT (Mínimo privilegio - Exigencia del profesor)
+RUN adduser -D miusuarioapp
 USER miusuarioapp
 
-# Copiamos el archivo .jar generado en la Etapa 1
-COPY --from=build /app/target/*.jar app.jar
+# Copiamos las dependencias y el código desde la etapa de construcción
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app ./
 
 EXPOSE 3001
-# Comando para iniciar la aplicación
-ENTRYPOINT ["java", "-jar", "app.jar"]
+CMD ["node", "server.js"]
