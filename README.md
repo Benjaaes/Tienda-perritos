@@ -518,8 +518,7 @@ Durante el desarrollo del proyecto se logró:
 
 ## Integrantes
 
-- Ignacio Valeria
-- Benjamín Flores
+-Benjamin Espinoza
 
 ---
 
